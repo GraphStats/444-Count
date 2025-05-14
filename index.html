@@ -954,6 +954,14 @@
     function setDocumentTitle(count) {
       document.title = `444 Count | ${count.toLocaleString()} Followers`;
     }
+    // Exemple de détection d'ad blocker en vérifiant si l'élément de publicité est présent
+window.addEventListener('load', function() {
+  // On recherche l'élément <ins> qui doit être inséré par adsbygoogle.js
+  var adElement = document.querySelector('.adsbygoogle');
+  if (!adElement) {
+    alert("It looks like you're using an ad blocker. To fully enjoy the site, please deactivate it.");
+  }
+});
   </script>
 </body>
 </html>
