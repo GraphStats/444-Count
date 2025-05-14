@@ -727,8 +727,7 @@
   </div>
 
   <footer>
-      <div>V1.4.5 (BETA) | Powered by GraphStats</div>
-    </div>
+      <div>V1.4.6 (BETA) | Powered by GraphStats</div>
   </footer>
 
   <script>
@@ -867,7 +866,6 @@
     }
 
     function showAlert(message, type) {
-      // In a real app, you would show a nice toast notification
       alert(message);
     }
 
@@ -922,37 +920,40 @@
         });
     }
 
-    // On load, check for hash
+    // On load, check for hash and only-count mode
     window.addEventListener('load', () => {
       const hash = window.location.hash.slice(1);
       if (hash) {
-        selectChannel(hash, {channelId}),
+        // Correction : on passe un titre par défaut et une chaîne vide pour l'avatar
+        selectChannel(hash, "Channel", "");
         document.getElementById('channel-input').value = hash;
-      if (new URL(window.location.href).searchParams.get('only-count') === 'true') {
-        activateOnlyCount();
-      }
+        if (new URL(window.location.href).searchParams.get('only-count') === 'true') {
+          activateOnlyCount();
+        }
       }
       
       updateVisitorCount();
       setInterval(updateVisitorCount, 10000);
 
-      // Initialize ads
       (adsbygoogle = window.adsbygoogle || []).push({});
     });
 
     function updateVisitorCount() {
-      // In a real app, you would fetch this from your analytics
+      // Exemples de mise à jour du compteur de visiteurs
       const visitors = Math.floor(Math.random() * 2) + 1;
       document.getElementById('visitor-count').textContent = visitors.toLocaleString();
     }
     
-    // Handle back/forward navigation
     window.addEventListener('popstate', () => {
       const hash = window.location.hash.slice(1);
       if (hash) {
-        selectChannel(hash, "Channel");
+        selectChannel(hash, "Channel", "");
       }
     });
+
+    function setDocumentTitle(count) {
+      document.title = `444 Count | ${count.toLocaleString()} Followers`;
+    }
   </script>
 </body>
 </html>
