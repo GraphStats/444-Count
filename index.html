@@ -24,6 +24,7 @@
     gtag('config', 'G-QMLQLT7FTY');
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <style>
@@ -330,6 +331,14 @@
     color: var(--accent-color);
     margin: 20px 0;
     font-family: 'Poppins', sans-serif;
+  }
+
+  /* Chart container */
+  .chart-container {
+    width: 100%;
+    height: 200px;
+    margin-top: 30px;
+    position: relative;
   }
 
   /* Action buttons */
@@ -743,6 +752,11 @@
           <div class="counter-label">Followers</div>
           <div id="subscriber-count" class="counter-value odometer">0</div>
           
+          <!-- Chart container -->
+          <div class="chart-container">
+            <canvas id="subscriberChart"></canvas>
+          </div>
+          
           <div class="action-buttons">
             <div class="share-menu">
               <button class="action-button primary-button" onclick="toggleShareOptions()">
@@ -778,6 +792,9 @@
     let intervalId;
     let odometer;
     let currentChannelData = null;
+    let subscriberChart;
+    let followerHistory = [];
+    const maxHistoryPoints = 30; // Keep last 30 data points
 
     // Initialize main content animation
     document.addEventListener('DOMContentLoaded', () => {
@@ -787,7 +804,101 @@
       
       // Check for ad blocker
       setTimeout(checkAdBlocker, 1000);
+      
+      // Initialize chart
+      initializeChart();
     });
+
+    function initializeChart() {
+      const ctx = document.getElementById('subscriberChart').getContext('2d');
+      subscriberChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Followers',
+            data: [],
+            borderColor: '#4cc9f0',
+            backgroundColor: 'rgba(76, 201, 240, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                label: function(context) {
+                  return `Followers: ${context.parsed.y.toLocaleString()}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: false,
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              display: true,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)',
+                drawBorder: false
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.6)',
+                callback: function(value) {
+                  if (value >= 1000000) {
+                    return (value / 1000000).toFixed(1) + 'M';
+                  }
+                  if (value >= 1000) {
+                    return (value / 1000).toFixed(1) + 'K';
+                  }
+                  return value;
+                }
+              }
+            }
+          },
+          interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false
+          }
+        }
+      });
+    }
+
+    function updateChart(count) {
+      const now = new Date();
+      const timeLabel = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      
+      // Add new data point
+      followerHistory.push({
+        count: count,
+        time: timeLabel
+      });
+      
+      // Limit history size
+      if (followerHistory.length > maxHistoryPoints) {
+        followerHistory.shift();
+      }
+      
+      // Update chart data
+      subscriberChart.data.labels = followerHistory.map(point => point.time);
+      subscriberChart.data.datasets[0].data = followerHistory.map(point => point.count);
+      subscriberChart.update();
+    }
 
     function handleKeyPress(event) {
       if (event.key === 'Enter') {
@@ -857,6 +968,7 @@
     function selectChannel(id, title, avatar) {
       channelId = id;
       currentChannelData = { id, title, avatar };
+      followerHistory = []; // Reset history when selecting new channel
       document.getElementById('result-list').innerHTML = '';
       document.getElementById('counter-container').style.display = 'block';
       document.getElementById('channel-name').textContent = title;
@@ -881,6 +993,7 @@
       clearInterval(intervalId);
       intervalId = setInterval(fetchStatsData, 2000);
     }
+
     async function fetchStatsData() {
       if (!channelId) return;
       try {
@@ -893,6 +1006,7 @@
           const followersCount = data.counts.find(count => count.value === "followers")?.count;
           if (followersCount !== undefined) {
             updateCounter(followersCount);
+            updateChart(followersCount);
             setDocumentTitle(followersCount);
             if (data.avatar && !currentChannelData.avatar) {
               currentChannelData.avatar = data.avatar;
@@ -904,6 +1018,7 @@
         console.error("Error fetching stats data:", error);
       }
     }
+
     function updateCounter(count) {
       if (odometer) {
         odometer.update(count);
@@ -1052,45 +1167,6 @@
         theme: 'default'
       });
     }
-
-    // Initialize Chart.js
-    const ctx = document.getElementById('subscriberChart').getContext('2d');
-    const subscriberChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [{
-          label: 'Abonnés',
-          data: [],
-          borderColor: '#9d8a79',
-          backgroundColor: '#4d443d',
-          fill: true,
-          tension: 0.2,
-          pointRadius: 0,
-          borderWidth: 7
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        animation: {
-          duration: 0
-        },
-        scales: {
-          x: {
-            display: false
-          },
-          y: {
-            display: false
-          }
-        },
-        plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    });
   </script>
 </body>
 </html>
