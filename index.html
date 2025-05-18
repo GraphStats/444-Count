@@ -1054,6 +1054,45 @@
         theme: 'default'
       });
     }
+
+    // Initialize Chart.js
+    const ctx = document.getElementById('subscriberChart').getContext('2d');
+    const subscriberChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Abonnés',
+          data: [],
+          borderColor: '#9d8a79',
+          backgroundColor: '#4d443d',
+          fill: true,
+          tension: 0.2,
+          pointRadius: 0,
+          borderWidth: 7
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        animation: {
+          duration: 0
+        },
+        scales: {
+          x: {
+            display: false
+          },
+          y: {
+            display: false
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
   </script>
 </body>
 </html>
