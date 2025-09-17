@@ -6,7 +6,7 @@
   <title>444 Count - Service Ended</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
@@ -40,24 +40,39 @@
       padding: 20px;
     }
 
+    .logo-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .logo-text {
+      font-size: 8vw;
+      font-weight: 900;
+      background: linear-gradient(to right, #4cc9f0, #4361ee, #3f37c9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: slideIn 1.5s forwards, moveUp 1s 2s forwards, gradientMove 3s infinite;
+      transform: translateX(100vw);
+      opacity: 0;
+    }
+
     .container {
       width: 100%;
       max-width: 800px;
       text-align: center;
       z-index: 10;
-    }
-
-    .logo {
-      margin-bottom: 30px;
-      opacity: 0.7;
-    }
-
-    .logo-text {
-      font-size: 3.5rem;
-      font-weight: 700;
-      background: linear-gradient(to right, var(--accent-color), var(--primary-color));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 1s ease, transform 1s ease;
     }
 
     .end-message {
@@ -141,13 +156,39 @@
     }
 
     /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes slideIn {
+      0% {
+        transform: translateX(100vw);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
 
-    .container {
-      animation: fadeIn 1s ease-out;
+    @keyframes moveUp {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-40vh);
+        opacity: 0.7;
+        font-size: 4vw;
+      }
+    }
+
+    @keyframes gradientMove {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     /* Background effects */
@@ -176,7 +217,7 @@
     /* Responsive */
     @media (max-width: 768px) {
       .logo-text {
-        font-size: 2.5rem;
+        font-size: 15vw;
       }
       
       h1 {
@@ -195,6 +236,18 @@
         flex-direction: column;
         gap: 15px;
       }
+      
+      @keyframes moveUp {
+        0% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-35vh);
+          opacity: 0.7;
+          font-size: 8vw;
+        }
+      }
     }
   </style>
 </head>
@@ -202,11 +255,11 @@
   <div class="background-element bg-1"></div>
   <div class="background-element bg-2"></div>
   
-  <div class="container">
-    <div class="logo">
-      <div class="logo-text">444 Count</div>
-    </div>
-    
+  <div class="logo-animation">
+    <div class="logo-text">444 Count</div>
+  </div>
+  
+  <div class="container" id="main-content">
     <div class="end-message">
       <h1>Service Ended</h1>
       <h2>444 Count is no longer available</h2>
@@ -222,7 +275,7 @@
         </div>
         <div class="date-item">
           <span>Service ended</span>
-          <strong>September 17, 2025</strong>
+          <strong>November 1, 2025</strong>
         </div>
       </div>
       
@@ -247,6 +300,13 @@
   </div>
 
   <script>
+    // Animation sequence
+    setTimeout(() => {
+      // Show main content after logo animation
+      document.getElementById('main-content').style.opacity = '1';
+      document.getElementById('main-content').style.transform = 'translateY(0)';
+    }, 3000); // 3 seconds delay
+
     // Disable all interactions
     document.addEventListener('keydown', function(e) {
       e.preventDefault();
